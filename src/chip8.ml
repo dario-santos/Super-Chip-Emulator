@@ -25,8 +25,8 @@ let chip8_fontset = [|
 (* Total memory *)
 let memory = Array.make 4096 0
 
-(* Register *)
-let reg = Array.make 16 0
+(* VN: One of the 16 available variables. N may be 0 to F (hexadecimal)*)
+let vn = Array.make 16 0
 
 let key = Array.make 16 0
 
@@ -44,38 +44,18 @@ let sound_timer = ref 0
 exception Undefined of string
 let error s = raise (Undefined s)
 
-let decode opcode =
-  let opcode = opcode land 0xF000 in 
-  match opcode with 
-  | 0xA000 -> 
-    i := opcode land 0x0FFF;
-    pc := !pc + 2
-  | 0x8XY4 -> 
-      
-
-    if(V[(opcode & 0x00F0) >> 4] > (0xFF - V[(opcode & 0x0F00) >> 8]))
-      V[0xF] = 1; //carry
-    else
-      V[0xF] = 0;
-    V[(opcode & 0x0F00) >> 8] += V[(opcode & 0x00F0) >> 4];
-    pc += 2; 
-  | _ -> error ("Opcode " ^ string_of_int opcode ^ "not implemented.")
-
-
 let clear_display () = 
-  set_color (rgb 220 220 220);
-  fill_rect 0 0 (truncate (64. *. 10.)) (truncate (32. *. 10.))
-
+    set_color (rgb 255 255 255);
+    fill_rect 0 0 (truncate (64. *. 10.)) (truncate (32. *. 10.))
+  
 let clear_array a =
     Array.fill a 0 ((Array.length a) - 1) 0
 
-
-let initialize () =
+let rec initialize () =
 
   (* Initialize the memory and registers *)
-  clear_display ();
   clear_array key;
-  clear_array reg;
+  clear_array vn;
   clear_array memory;
 
   stack := [];
@@ -89,7 +69,7 @@ let initialize () =
 	delay_timer := 0;
 	sound_timer := 0
 
-let cicle () =
+and cicle () =
   (* One emulation cicle *) 
       
   (* 1 - Fetch Opcode *)
@@ -127,4 +107,42 @@ let cicle () =
     sound_timer := !sound_timer - 1
   in
 
-  assert false 
+  assert false
+
+and decode opcode =
+    let oc  = opcode lsr 12 in 
+    let x   = (opcode land 0x0F00) lsr 8 in
+    let y   = (opcode land 0x00F0) lsr 4 in
+    let c   = (opcode land 0x000F) lsr 2 in 
+    let nn  = opcode land 0x00FF in
+    let nnn = opcode land 0x0FFF in
+    match oc, x, y, c with
+    | 0x0, _, 0xE, 0xE -> (* Clears the screen *)  
+      clear_display (); 
+      pc := !pc + 2
+    | 0x0, _, 0xE, _   -> assert false
+    | 0x0, _, _, _ -> assert false
+    | 0x3, _, _, _ ->
+      pc := if x == nn then !pc + 4 else !pc + 2
+    | 0x1, _, _, _ -> 
+      pc := nnn
+    | 0xA, _, _, _ -> 
+      i := nnn;
+      pc := !pc + 2
+    | _ -> ()
+  
+
+exception Room of string
+
+let load_file rom =
+  initialize ();
+  
+  (* Load the ROM into RAM. *)
+  let rom = open_in_bin rom in
+  let rom_length = in_channel_length rom in
+  if rom_length > 0xFFF - 0x200 + 1 then raise (Room "The given file is too big to be a CHIP-8 ROM.");
+  
+  for i = 0 to rom_length - 1 do
+    memory.(0x200 + i) <- input_byte rom
+  done;
+  close_in rom

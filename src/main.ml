@@ -25,8 +25,8 @@ let main () =
   initialize Chip8 system and load the game
 
   *)
-  let _ = setup_graphics () in
-  let _ = Chip8.initialize () in
+  Chip8.load_file "pong2.c8";
+  setup_graphics ();
 
   (* Emulation Loop *)
 
