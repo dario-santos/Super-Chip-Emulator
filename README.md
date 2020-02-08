@@ -16,25 +16,25 @@ List of opcodes
 - [X] 7XNN
 - [X] 8XY0
 - [X] 8XY1
-- [ ] 8XY2
-- [ ] 8XY3
-- [ ] 8XY4
-- [ ] 8XY5
-- [ ] 8XY6
-- [ ] 8XY7
-- [ ] 8XYE
-- [ ] 9XY0
+- [X] 8XY2
+- [X] 8XY3
+- [X] 8XY4
+- [X] 8XY5
+- [X] 8XY6
+- [X] 8XY7
+- [X] 8XYE
+- [X] 9XY0
 - [X] ANNN
-- [ ] BNNN
-- [ ] CXNN
+- [X] BNNN
+- [X] CXNN
 - [ ] DXYN
-- [ ] EX9E
-- [ ] EXA1
-- [ ] FX07
+- [X] EX9E
+- [X] EXA1
+- [X] FX07
 - [ ] FX0A
-- [ ] FX15
-- [ ] FX18
-- [ ] FX1E
+- [X] FX15
+- [X] FX18
+- [X] FX1E
 - [ ] FX29
 - [ ] FX33
 - [ ] FX55

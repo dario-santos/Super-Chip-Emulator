@@ -105,9 +105,8 @@ and cicle () =
     let _ = if !sound_timer = 1 then Graphics.sound 500 5000 else ();
   
     sound_timer := !sound_timer - 1
-  in
-
-  assert false
+    in
+  ()
 
 and decode opcode =
     let oc  = opcode lsr 12 in 
@@ -128,7 +127,7 @@ and decode opcode =
     | 0x3, _, _, _ -> (* Skips the next instruction if VN(X) equals NN *)
       pc := if vn.(x) = nn then !pc + 4 else !pc + 2
     | 0x4, _, _, _ -> (* Skips the next instruction if VN(X) doesn't equal NN *)
-      pc := if vn.(x) != nn then !pc + 4 else !pc + 2
+      pc := if vn.(x) <> nn then !pc + 4 else !pc + 2
     | 0x5, _, _, 0x0 -> (* Skips the next instruction if VX equals VY. *)
       pc := if vn.(x) = vn.(y) then !pc + 4 else !pc + 2   
     | 0x6, _, _, _ -> (* Assigns the value of NN to VX. *)
@@ -140,14 +139,69 @@ and decode opcode =
     | 0x8, _, _, 0x0 -> (* Sets VX to the value of VY. *)
       vn.(x) <- vn.(y);
       pc := !pc + 2
-    | 0x8, _, _, 0x1 -> (* Sets VX to the value of VY. *)
+    | 0x8, _, _, 0x1 -> (* Sets VX to VX or VY. (Bitwise OR operation) *)
       vn.(x) <- vn.(x) lor vn.(y);
       pc := !pc + 2
-    
-    | 0xA, _, _, _ -> 
+    | 0x8, _, _, 0x2 -> (* Sets VX to VX and VY. (Bitwise AND operation) *)
+      vn.(x) <- vn.(x) land vn.(y);
+      pc := !pc + 2
+    | 0x8, _, _, 0x3 -> (* Sets VX to VX xor VY. (Bitwise XOR operation) *)
+      vn.(x) <- vn.(x) lxor vn.(y);
+      pc := !pc + 2
+    | 0x8, _, _, 0x4 -> (* Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't. *)
+      vn.(x) <- vn.(x) + vn.(y);
+      vn.(15) <- if (abs vn.(x)) > 9 then 1 else 0;
+      pc := !pc + 2
+    | 0x8, _, _, 0x5 -> (* VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't. *)
+      vn.(15) <- if not (vn.(y) > vn.(x)) then 1 else 0;
+      vn.(x) <- vn.(x) - vn.(y);
+      pc := !pc + 2
+    | 0x8, _, _, 0x6 -> (* Stores the least significant bit of VX in VF and then shifts VX to the right by 1. *)
+      vn.(15) <- vn.(x) land 0x1; 
+      vn.(x) <- vn.(x) lsr 1;
+      pc := !pc + 2
+    | 0x8, _, _, 0x7 -> (* Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't. *)
+      vn.(15) <- if not (vn.(x) > vn.(y)) then 1 else 0;
+      vn.(x) <- vn.(y) - vn.(x);
+      pc := !pc + 2
+    | 0x8, _, _, 0xE -> (* Stores the most significant bit of VX in VF and then shifts VX to the left by 1. *)
+      vn.(15) <- vn.(x) land 0x80; 
+      vn.(x) <- vn.(x) lsl 1;
+      pc := !pc + 2
+    | 0x9, _, _, 0x0 -> (* Skips the next instruction if VX doesn't equal VY. *)
+      pc := if vn.(x) <> vn.(y) then !pc + 4 else !pc + 2
+    | 0xA, _, _, _ -> (* Sets I to the address NNN. *)
       i := nnn;
       pc := !pc + 2
-    | _ -> ()
+    | 0xB, _, _, _ -> (* Jumps to the address NNN plus V0. *)
+      pc := vn.(0) + nnn
+    | 0xC, _, _, _ -> (* Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and NN. *)
+      vn.(x) <- (Random.int 255) land nn;
+      pc := !pc + 2
+    | 0xD, _, _, _ -> assert false
+    | 0xE, _, 0x9, 0xE -> (* Skips the next instruction if the key stored in VX is pressed. *)
+      pc := if key.(vn.(x)) = 1 then !pc + 4 else !pc + 2
+    | 0xE, _, 0xA, 0x1 -> (* Skips the next instruction if the key stored in VX isn't pressed. *)
+      pc := if key.(vn.(x)) <> 1 then !pc + 4 else !pc + 2
+    | 0xF, _, 0x0, 0x7 -> (* Sets VX to the value of the delay timer. *)
+      vn.(x) <- !delay_timer;
+      pc := !pc + 2
+    | 0xF, _, 0x0, 0xA -> assert false
+    | 0xF, _, 0x1, 0x5 -> (* Sets the delay timer to VX. *)
+      delay_timer := vn.(x);
+      pc := !pc + 2
+    | 0xF, _, 0x1, 0x8 -> (* Sets the sound timer to VX. *)
+      sound_timer := vn.(x);
+      pc := !pc + 2
+    | 0xF, _, 0x1, 0xE -> (* Adds VX to I. VF is set to 1 when there is a range overflow 0 otherwise. *)
+      vn.(15) <- if !i + vn.(x) > 0xFFF then 1 else 0;
+      i := !i + vn.(x); 
+      pc := !pc + 2
+    | 0xF, _, 0x2, 0x9 -> assert false
+    | 0xF, _, 0x3, 0x3 -> assert false
+    | 0xF, _, 0x5, 0x5 -> assert false
+    | 0xF, _, 0x6, 0x5 -> assert false
+    | _ -> raise (Undefined "Error, opcode undefined.")
   
 
 exception Room of string
