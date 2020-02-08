@@ -10,8 +10,8 @@ List of opcodes
 - [X] 1NNN
 - [ ] 2NNN
 - [X] 3XNN
-- [ ] 4XNN
-- [ ] 5XY0
+- [X] 4XNN
+- [X] 5XY0
 - [ ] 6XNN
 - [ ] 7XNN
 - [ ] 8XY0

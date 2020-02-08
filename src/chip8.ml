@@ -117,15 +117,21 @@ and decode opcode =
     let nn  = opcode land 0x00FF in
     let nnn = opcode land 0x0FFF in
     match oc, x, y, c with
-    | 0x0, _, 0xE, 0xE -> (* Clears the screen *)  
+    | 0x0, 0x0, 0xE, 0xE -> assert false
+    | 0x0, 0x0, 0xE, 0x0 -> (* Clears the screen *)  
       clear_display (); 
       pc := !pc + 2
-    | 0x0, _, 0xE, _   -> assert false
     | 0x0, _, _, _ -> assert false
-    | 0x3, _, _, _ ->
-      pc := if x == nn then !pc + 4 else !pc + 2
-    | 0x1, _, _, _ -> 
+    | 0x1, _, _, _ -> (* Jumps to address NNN *)
       pc := nnn
+    | 0x2, _, _, _ -> assert false  
+    | 0x3, _, _, _ -> (* Skips the next instruction if VN(X) equals NN *)
+      pc := if vn.(x) = nn then !pc + 4 else !pc + 2
+    | 0x4, _, _, _ -> (* Skips the next instruction if VN(X) doesn't equal NN *)
+      pc := if vn.(x) != nn then !pc + 4 else !pc + 2
+    | 0x5, _, _, 0x0 -> (* Skips the next instruction if VX equals VY. *)
+      pc := if vn.(x) = vn.(y) then !pc + 4 else !pc + 2
+      
     | 0xA, _, _, _ -> 
       i := nnn;
       pc := !pc + 2
