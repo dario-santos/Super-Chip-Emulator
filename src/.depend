@@ -1,0 +1,5 @@
+chip8.cmo : chip8.cmi
+chip8.cmx : chip8.cmi
+chip8.cmi :
+main.cmo : chip8.cmi
+main.cmx : chip8.cmx
