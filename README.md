@@ -12,10 +12,10 @@ List of opcodes
 - [X] 3XNN
 - [X] 4XNN
 - [X] 5XY0
-- [ ] 6XNN
-- [ ] 7XNN
-- [ ] 8XY0
-- [ ] 8XY1
+- [X] 6XNN
+- [X] 7XNN
+- [X] 8XY0
+- [X] 8XY1
 - [ ] 8XY2
 - [ ] 8XY3
 - [ ] 8XY4

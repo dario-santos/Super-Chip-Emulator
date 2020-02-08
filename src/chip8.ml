@@ -130,8 +130,20 @@ and decode opcode =
     | 0x4, _, _, _ -> (* Skips the next instruction if VN(X) doesn't equal NN *)
       pc := if vn.(x) != nn then !pc + 4 else !pc + 2
     | 0x5, _, _, 0x0 -> (* Skips the next instruction if VX equals VY. *)
-      pc := if vn.(x) = vn.(y) then !pc + 4 else !pc + 2
-      
+      pc := if vn.(x) = vn.(y) then !pc + 4 else !pc + 2   
+    | 0x6, _, _, _ -> (* Assigns the value of NN to VX. *)
+      vn.(x) <- nn;
+      pc := !pc + 2
+    | 0x7, _, _, _ ->   (* Adds NN to VX *)
+      vn.(x) <- nn;
+      pc := !pc + 2
+    | 0x8, _, _, 0x0 -> (* Sets VX to the value of VY. *)
+      vn.(x) <- vn.(y);
+      pc := !pc + 2
+    | 0x8, _, _, 0x1 -> (* Sets VX to the value of VY. *)
+      vn.(x) <- vn.(x) lor vn.(y);
+      pc := !pc + 2
+    
     | 0xA, _, _, _ -> 
       i := nnn;
       pc := !pc + 2
