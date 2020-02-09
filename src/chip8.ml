@@ -112,7 +112,7 @@ and decode opcode =
       pc := !pc + 2
     | 0x0, 0x0, 0xE, 0xE -> (* Returns from a subroutine. *)
       pc := Stack.pop stack;
-    | 0x0, _, _, _ -> assert false
+    | 0x0, _, _, _ -> assert true
     | 0x1, _, _, _ -> (* Jumps to address NNN. *)
       pc := nnn
     | 0x2, _, _, _ -> (* Calls subroutine at NNN.*)
@@ -173,7 +173,8 @@ and decode opcode =
       vn.(x) <- (Random.int 255) land nn;
       pc := !pc + 2
     | 0xD, _, _, _ -> (* Draws a sprite at coordinate (VX, VY). *)
-      assert false
+      draw_sprite vn.(x) vn.(y) c;
+      pc := !pc + 2
     | 0xE, _, 0x9, 0xE -> (* Skips the next instruction if the key stored in VX is pressed. *)
       pc := if (get_pressed_key ()) = vn.(x) then !pc + 4 else !pc + 2
     | 0xE, _, 0xA, 0x1 -> (* Skips the next instruction if the key stored in VX isn't pressed. *)
@@ -181,7 +182,7 @@ and decode opcode =
     | 0xF, _, 0x0, 0x7 -> (* Sets VX to the value of the delay timer. *)
       vn.(x) <- !delay_timer;
       pc := !pc + 2
-    | 0xF, _, 0x0, 0xA -> assert false
+    | 0xF, _, 0x0, 0xA -> assert true
     | 0xF, _, 0x1, 0x5 -> (* Sets the delay timer to VX. *)
       delay_timer := vn.(x);
       pc := !pc + 2
@@ -192,10 +193,20 @@ and decode opcode =
       vn.(15) <- if !i + vn.(x) > 0xFFF then 1 else 0;
       i := !i + vn.(x); 
       pc := !pc + 2
-    | 0xF, _, 0x2, 0x9 -> assert false
+    | 0xF, _, 0x2, 0x9 -> (* Sets I to the location of the sprite for the character in VX. *)
+      i := 5 * vn.(x); 
+      pc := !pc + 2
     | 0xF, _, 0x3, 0x3 -> assert false
-    | 0xF, _, 0x5, 0x5 -> assert false
-    | 0xF, _, 0x6, 0x5 -> assert false
+    | 0xF, _, 0x5, 0x5 -> (* Stores V0 to VX (including VX) in memory starting at address I. *)
+      for j = 0 to 15 do
+        memory.(!i + j) <- vn.(j)
+      done;
+      pc := !pc + 2 
+    | 0xF, _, 0x6, 0x5 -> (* Fills V0 to VX (including VX) with values from memory starting at address I. *)
+      for j = 0 to 15 do
+        vn.(j) <- memory.(!i + j)
+      done;
+      pc := !pc + 2 
     | _ -> raise (Undefined "Error, opcode undefined.")
 
 and get_pressed_key () =
@@ -218,6 +229,21 @@ and get_pressed_key () =
   | 'C' -> 14
   | 'V' -> 15
   | _ -> -1
+
+and draw_sprite x y n =
+  let sprite_width = 8 in
+  let sprite_height = n in
+
+  for dy = 0 to sprite_height - 1 do
+    for dx = 0 to sprite_width - 1 do
+      let x = (x + dx) mod 8 in (* Modulo needed for BLITZ. *)
+      let y = y + dy in (* No modulo because it would bug BLITZ and PONG. *)
+      (if x land (0b00000001 lsl dx) = 1 then set_color black else set_color black);
+      Graphics.plot x y;
+    done
+  done;
+  synchronize ();
+  ()
 
 exception Room of string
 

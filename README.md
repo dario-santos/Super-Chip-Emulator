@@ -36,10 +36,10 @@ A Chip8 emulator
 - [X] FX15
 - [X] FX18
 - [X] FX1E
-- [ ] FX29
+- [X] FX29
 - [ ] FX33
-- [ ] FX55
-- [ ] FX65
+- [X] FX55
+- [X] FX65
 
 ## Sound
 
