@@ -18,13 +18,7 @@ let setup_graphics () =
 let main () =  
   (* Setup graphics and Input*)
 
-  (*
-
-  setupInput ()
-
-  initialize Chip8 system and load the game
-
-  *)
+  (* Initialize Chip8 system and load the game *)
   Chip8.load_file "pong2.c8";
   setup_graphics ();
 

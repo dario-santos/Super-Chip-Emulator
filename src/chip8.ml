@@ -42,10 +42,6 @@ let i = ref 0
 exception Undefined of string
 let error s = raise (Undefined s)
 
-let clear_display () = 
-    set_color (rgb 255 255 255);
-    fill_rect 0 0 (truncate (64. *. 10.)) (truncate (32. *. 10.))
-  
 let clear_array a = Array.fill a 0 ((Array.length a) - 1) 0
 
 let rec initialize () =
@@ -176,9 +172,9 @@ and decode opcode =
       draw_sprite vn.(x) vn.(y) c;
       pc := !pc + 2
     | 0xE, _, 0x9, 0xE -> (* Skips the next instruction if the key stored in VX is pressed. *)
-      pc := if (get_pressed_key ()) = vn.(x) then !pc + 4 else !pc + 2
+      pc := if Input.is_key_pressed vn.(x) then !pc + 4 else !pc + 2
     | 0xE, _, 0xA, 0x1 -> (* Skips the next instruction if the key stored in VX isn't pressed. *)
-      pc := if (get_pressed_key ()) <> vn.(x) then !pc + 4 else !pc + 2
+      pc := if Input.is_key_pressed vn.(x) then !pc + 4 else !pc + 2
     | 0xF, _, 0x0, 0x7 -> (* Sets VX to the value of the delay timer. *)
       vn.(x) <- !delay_timer;
       pc := !pc + 2
@@ -208,42 +204,6 @@ and decode opcode =
       done;
       pc := !pc + 2 
     | _ -> raise (Undefined "Error, opcode undefined.")
-
-and get_pressed_key () =
-  if not (key_pressed ()) then -1 else
-  match (read_key ()) with  
-  | '1' -> 0
-  | '2' -> 1
-  | '3' -> 2
-  | '4' -> 3
-  | 'Q' -> 4
-  | 'W' -> 5
-  | 'E' -> 6
-  | 'R' -> 7
-  | 'A' -> 8
-  | 'S' -> 9
-  | 'D' -> 10
-  | 'F' -> 11
-  | 'Z' -> 12
-  | 'X' -> 13
-  | 'C' -> 14
-  | 'V' -> 15
-  | _ -> -1
-
-and draw_sprite x y n =
-  let sprite_width = 8 in
-  let sprite_height = n in
-
-  for dy = 0 to sprite_height - 1 do
-    for dx = 0 to sprite_width - 1 do
-      let x = (x + dx) mod 8 in (* Modulo needed for BLITZ. *)
-      let y = y + dy in (* No modulo because it would bug BLITZ and PONG. *)
-      (if x land (0b00000001 lsl dx) = 1 then set_color black else set_color black);
-      Graphics.plot x y;
-    done
-  done;
-  synchronize ();
-  ()
 
 exception Room of string
 
