@@ -22,24 +22,22 @@ let chip8_fontset = [|
   0xF0; 0x80; 0xF0; 0x80; 0x80  (* F *)
 |]
 
-(* Total memory *)
+(* Memory ram - 4KB*)
 let memory = Array.make 4096 0
 
-(* VN: One of the 16 available variables. N may be 0 to F (hexadecimal)*)
+(* Registers: One of the 16 available variables.*)
 let vn = Array.make 16 0
 
-let key = Array.make 16 0
-
-let stack : int list ref = ref []
-
-let pc = ref 0x200
-let opcode = ref 0
-let i = ref 0
-let sp = ref 0
+(* The Stack - Used for returns, normally has 48 bytes and 12 levels *)
+let stack = Stack.create ()
 
 (* Timers *)
 let delay_timer = ref 0
 let sound_timer = ref 0
+
+let pc = ref 0x200
+let opcode = ref 0
+let i = ref 0
 
 exception Undefined of string
 let error s = raise (Undefined s)
@@ -48,17 +46,13 @@ let clear_display () =
     set_color (rgb 255 255 255);
     fill_rect 0 0 (truncate (64. *. 10.)) (truncate (32. *. 10.))
   
-let clear_array a =
-    Array.fill a 0 ((Array.length a) - 1) 0
+let clear_array a = Array.fill a 0 ((Array.length a) - 1) 0
 
 let rec initialize () =
-
-  (* Initialize the memory and registers *)
-  clear_array key;
+  (* Clear the memory, registers and stack *)
   clear_array vn;
   clear_array memory;
-
-  stack := [];
+  Stack.clear stack;
 
   (* Load fontset *)
   for i = 0 to 79 do
@@ -92,13 +86,10 @@ and cicle () =
   *)
   opcode := (memory.(!pc) lsl 8) lor memory.(!pc + 1);
 
-  (* 
-    Decode Opcode
-    Execute Opcode
-   *)
+  (* 2 - Decode and Execute Opcode *)
   ignore(decode !opcode);
 
-  (* Update timers *)
+  (* 3 - Update timers *)
   delay_timer := if !delay_timer > 0 then !delay_timer - 1 else !delay_timer;
 
   if !sound_timer > 0 then
@@ -116,14 +107,17 @@ and decode opcode =
     let nn  = opcode land 0x00FF in
     let nnn = opcode land 0x0FFF in
     match oc, x, y, c with
-    | 0x0, 0x0, 0xE, 0xE -> assert false
-    | 0x0, 0x0, 0xE, 0x0 -> (* Clears the screen *)  
+    | 0x0, 0x0, 0xE, 0x0 -> (* Clears the screen. *)  
       clear_display (); 
       pc := !pc + 2
+    | 0x0, 0x0, 0xE, 0xE -> (* Returns from a subroutine. *)
+      pc := Stack.pop stack;
     | 0x0, _, _, _ -> assert false
-    | 0x1, _, _, _ -> (* Jumps to address NNN *)
+    | 0x1, _, _, _ -> (* Jumps to address NNN. *)
       pc := nnn
-    | 0x2, _, _, _ -> assert false  
+    | 0x2, _, _, _ -> (* Calls subroutine at NNN.*)
+      Stack.push !pc stack;
+      pc := nnn
     | 0x3, _, _, _ -> (* Skips the next instruction if VN(X) equals NN *)
       pc := if vn.(x) = nn then !pc + 4 else !pc + 2
     | 0x4, _, _, _ -> (* Skips the next instruction if VN(X) doesn't equal NN *)
@@ -133,7 +127,7 @@ and decode opcode =
     | 0x6, _, _, _ -> (* Assigns the value of NN to VX. *)
       vn.(x) <- nn;
       pc := !pc + 2
-    | 0x7, _, _, _ ->   (* Adds NN to VX *)
+    | 0x7, _, _, _ -> (* Adds NN to VX *)
       vn.(x) <- nn;
       pc := !pc + 2
     | 0x8, _, _, 0x0 -> (* Sets VX to the value of VY. *)
@@ -178,11 +172,12 @@ and decode opcode =
     | 0xC, _, _, _ -> (* Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and NN. *)
       vn.(x) <- (Random.int 255) land nn;
       pc := !pc + 2
-    | 0xD, _, _, _ -> assert false
+    | 0xD, _, _, _ -> (* Draws a sprite at coordinate (VX, VY). *)
+      assert false
     | 0xE, _, 0x9, 0xE -> (* Skips the next instruction if the key stored in VX is pressed. *)
-      pc := if key.(vn.(x)) = 1 then !pc + 4 else !pc + 2
+      pc := if (get_pressed_key ()) = vn.(x) then !pc + 4 else !pc + 2
     | 0xE, _, 0xA, 0x1 -> (* Skips the next instruction if the key stored in VX isn't pressed. *)
-      pc := if key.(vn.(x)) <> 1 then !pc + 4 else !pc + 2
+      pc := if (get_pressed_key ()) <> vn.(x) then !pc + 4 else !pc + 2
     | 0xF, _, 0x0, 0x7 -> (* Sets VX to the value of the delay timer. *)
       vn.(x) <- !delay_timer;
       pc := !pc + 2
@@ -202,7 +197,27 @@ and decode opcode =
     | 0xF, _, 0x5, 0x5 -> assert false
     | 0xF, _, 0x6, 0x5 -> assert false
     | _ -> raise (Undefined "Error, opcode undefined.")
-  
+
+and get_pressed_key () =
+  if not (key_pressed ()) then -1 else
+  match (read_key ()) with  
+  | '1' -> 0
+  | '2' -> 1
+  | '3' -> 2
+  | '4' -> 3
+  | 'Q' -> 4
+  | 'W' -> 5
+  | 'E' -> 6
+  | 'R' -> 7
+  | 'A' -> 8
+  | 'S' -> 9
+  | 'D' -> 10
+  | 'F' -> 11
+  | 'Z' -> 12
+  | 'X' -> 13
+  | 'C' -> 14
+  | 'V' -> 15
+  | _ -> -1
 
 exception Room of string
 

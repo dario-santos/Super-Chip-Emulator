@@ -35,7 +35,6 @@ let main () =
     Chip8.cicle ();
     
     (* Update graphics *)
-    (* See if the player is pressing any key *)
     ()
   done;
   0

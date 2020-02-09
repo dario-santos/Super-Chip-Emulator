@@ -2,13 +2,14 @@
 A Chip8 emulator
 
 # Todo
-List of opcodes
 
-- [ ] 0NNN
-- [ ] 00E0
+## List of opcodes
+
+- [X] 00E0
 - [X] 00EE
+- [ ] 0NNN
 - [X] 1NNN
-- [ ] 2NNN
+- [X] 2NNN
 - [X] 3XNN
 - [X] 4XNN
 - [X] 5XY0
@@ -39,3 +40,7 @@ List of opcodes
 - [ ] FX33
 - [ ] FX55
 - [ ] FX65
+
+## Sound
+
+When ```sound_timer``` is equal to 0 we need to play a beep. 
