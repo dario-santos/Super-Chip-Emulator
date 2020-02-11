@@ -28,7 +28,7 @@ A Chip8 emulator
 - [X] ANNN
 - [X] BNNN
 - [X] CXNN
-- [ ] DXYN
+- [X] DXYN
 - [X] EX9E
 - [X] EXA1
 - [X] FX07
@@ -37,7 +37,7 @@ A Chip8 emulator
 - [X] FX18
 - [X] FX1E
 - [X] FX29
-- [ ] FX33
+- [X] FX33
 - [X] FX55
 - [X] FX65
 
