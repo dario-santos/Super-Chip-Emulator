@@ -73,24 +73,3 @@ def load_file(rom):
   
     for i in range(0, rom_length):
       memory[0x200 + i] = int.from_bytes(rom.read(1), "big")
-
-
-import time
-def print_debug(opcode):
-  """
-  Parameters
-  ----------
-  opcode : int
-    The opcode that will be executed by the CPU
-  """
-  global memory, vn, stack, timer_delay, timer_sound, pc, I
-  print('opcode:    ', hex(opcode))
-  print('pc:    ', pc)
-  print('I:    ', I)
-  print('timer_delay:    ', timer_delay)
-  print('timer_sound:    ', timer_sound)
-  print('vn:    ', vn)
-  #print('memory:    ', memory)
-
-  time.sleep(0)
-  
