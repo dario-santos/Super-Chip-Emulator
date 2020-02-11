@@ -19,7 +19,9 @@ def initialize(rom):
   pygame.display.flip()
   pygame.display.update()
 
-  rom = rom.split('.')[0]
+  rom = rom.split('/')
+  rom = rom[len(rom) - 1].split('.')[0]
+
   pygame.display.set_caption('CHIP8 - ' + rom.capitalize())
 
 def clear_display():
@@ -49,11 +51,11 @@ def draw_sprite(x, y, n):
   for dy in range(n):
     line = mem.memory[cpu.I + dy]
     for dx in range(8):
-      if (line & (0x80 >> dx)) != 0:
-        loc = (x + dx + ((dy + y) * 64)) % 2048
 
-        if display_buffer[loc] == 1:
-          mem.vn[0xF] = 1
+      if (line & (0x80 >> dx)) != 0:
+        loc = (x + dx + ((dy + y) << 6)) % 2048
+
+        mem.vn[0xF] |= display_buffer[loc] & 1
         display_buffer[loc] ^= 1
 
   draw = True

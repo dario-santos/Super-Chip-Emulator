@@ -84,23 +84,26 @@ def decode(opcode):
   elif oc == 0x5 and c == 0x0: # Skips the next instruction if VX equals VY.
     pc = pc + 4 if mem.vn[x] == mem.vn[y] else pc + 2
   elif oc == 0x6: # Assigns the value of NN to VX.
-    mem.vn[x] = nn
+    mem.vn[x] = nn & 0xFF
     pc += 2
   elif oc == 0x7: # Adds NN to VX.
     mem.vn[x] += nn
     mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0x8 and c == 0x0: # Sets VX to the value of VY.
-    mem.vn[x] = mem.vn[y]
+    mem.vn[x] = mem.vn[y] & 0xFF
     pc += 2
   elif oc == 0x8 and c == 0x1: # Sets VX to VX or VY. (Bitwise OR operation)
     mem.vn[x] = mem.vn[x] | mem.vn[y]
+    mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0x8 and c == 0x2: # Sets VX to VX and VY. (Bitwise AND operation)
     mem.vn[x] = mem.vn[x] & mem.vn[y]
+    mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0x8 and c == 0x3: # Sets VX to VX xor VY. (Bitwise XOR operation)
     mem.vn[x] = mem.vn[x] ^ mem.vn[y]
+    mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0x8 and c == 0x4: # Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
     mem.vn[0xF] = 1  if mem.vn[y] > (0xFF - mem.vn[x]) else 0
@@ -119,10 +122,12 @@ def decode(opcode):
   elif oc == 0x8 and c == 0x7: # Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
     mem.vn[0xF] = 0 if mem.vn[x] > mem.vn[y] else 1
     mem.vn[x] = mem.vn[y] - mem.vn[x]
+    mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0x8 and c == 0xE: # Stores the most significant bit of VX in VF and then shifts VX to the left by 1.
     mem.vn[0xF] = mem.vn[x] >> 7
     mem.vn[x] = mem.vn[x] << 1
+    mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0x9 and c == 0x0: # Skips the next instruction if VX doesn't equal VY.
     pc = pc + 4 if mem.vn[x] != mem.vn[y] else pc + 2
@@ -132,7 +137,8 @@ def decode(opcode):
   elif oc == 0xB: # Jumps to the address NNN plus V0.
     pc = mem.vn[0x0] + nnn
   elif oc == 0xC: # Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and NN.
-    mem.vn[x] = (random.randint(0, 255)) & nn;
+    mem.vn[x] = (random.randint(0, 255)) & nn
+    mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0xD: # Draws a sprite at coordinate (VX, VY).
     gpu.draw_sprite(mem.vn[x], mem.vn[y], c)
@@ -180,6 +186,3 @@ def decode(opcode):
     pc += 2
   else:
     assert False 
-
-  mem.vn[x] &= 0xFF
-  mem.vn[y] &= 0xFF
