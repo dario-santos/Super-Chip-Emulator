@@ -1,6 +1,7 @@
 import random
 import gpu
 import input
+import sound
 import memory as mem
 
 pc     = 0x200
@@ -45,8 +46,7 @@ def cicle ():
   timer_delay = timer_delay - 1 if timer_delay > 0 else timer_delay
 
   if timer_sound > 0:
-    if timer_sound == 1: 
-      print('Beep \a')
+    if timer_sound == 1: sound.play()
 
     timer_sound -= 1
     

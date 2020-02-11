@@ -1,5 +1,6 @@
 import sys
 import pygame
+import sound
 import gpu
 import input
 import cpu
@@ -23,6 +24,7 @@ def main():
   # Setup CPU and GPU
   cpu.initialize()
   gpu.initialize(rom_path)
+  sound.initialize()
 
   # Emulation Loop
   running = True
