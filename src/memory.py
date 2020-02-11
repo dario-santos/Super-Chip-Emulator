@@ -52,11 +52,6 @@ vn = [0] * 16
 # The Stack - Used for returns, normally has 48 bytes and 12 levels
 stack = []
 
-# Timers 
-timer_delay = 0
-timer_sound = 0
-
-
 def initialize():
   global memory, fontset
   # Load fontset

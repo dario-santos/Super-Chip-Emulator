@@ -10,6 +10,10 @@ pc     = 0
 I      = 0
 opcode = 0
 
+# Timers 
+timer_delay = 0
+timer_sound = 0
+
 def initialize():
   global pc, timer_delay, timer_sound
 
