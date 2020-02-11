@@ -23,10 +23,9 @@ def initialize(rom):
   pygame.display.set_caption('CHIP8 - ' + rom.capitalize())
 
 def clear_display():
-  global screen
-  screen.fill((0, 0, 0))
-  pygame.display.flip()
-  pygame.display.update()
+  global draw, display_buffer
+  display_buffer = [0] * 32 * 64 
+  draw = True
 
 def drawScreen():
   global screen, display_buffer

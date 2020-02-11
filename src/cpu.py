@@ -64,9 +64,7 @@ def decode(opcode):
   c   = opcode & 0x000F
   nn  = opcode & 0x00FF
   nnn = opcode & 0x0FFF
-  
-  print('me:',hex(opcode))
-  
+    
   if oc == 0x0 and x == 0x0 and y == 0xE and c == 0x0:   # CLS - Clead the display
     gpu.clear_display()
     pc += 2
@@ -90,6 +88,7 @@ def decode(opcode):
     pc += 2
   elif oc == 0x7: # Adds NN to VX.
     mem.vn[x] += nn
+    mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0x8 and c == 0x0: # Sets VX to the value of VY.
     mem.vn[x] = mem.vn[y]
@@ -106,14 +105,16 @@ def decode(opcode):
   elif oc == 0x8 and c == 0x4: # Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
     mem.vn[0xF] = 1  if mem.vn[y] > (0xFF - mem.vn[x]) else 0
     mem.vn[x] += mem.vn[y]
+    mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0x8 and c == 0x5: # VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't
     mem.vn[0xF] = 0 if mem.vn[y] > mem.vn[x] else 1
     mem.vn[x] -= mem.vn[y]
+    mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0x8 and c == 0x6: # Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
     mem.vn[0xF] = mem.vn[x] & 0x1
-    mem.vn[x] = mem.vn[x] >> 1    
+    mem.vn[x] = mem.vn[x] >> 1
     pc += 2
   elif oc == 0x8 and c == 0x7: # Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
     mem.vn[0xF] = 0 if mem.vn[x] > mem.vn[y] else 1
@@ -165,9 +166,9 @@ def decode(opcode):
     I = mem.vn[x] * 0x5
     pc += 2
   elif oc == 0xF and y == 0x3 and c == 0x3: # Stores the binary-coded decimal representation of VX.
-    mem.memory[I]     = int (mem.vn[x] / 100)
-    mem.memory[I + 1] = int ((mem.vn[x] / 10) % 10)
-    mem.memory[I + 2] = int ((mem.vn[x] % 100) % 10)
+    mem.memory[I]     = int (mem.vn[x] / 100)        & 0xFF
+    mem.memory[I + 1] = int ((mem.vn[x] / 10) % 10)  & 0xFF
+    mem.memory[I + 2] = int ((mem.vn[x] % 100) % 10) & 0xFF
     pc += 2
   elif oc == 0xF and y == 0x5 and c == 0x5: # Stores V0 to VX (including VX) in memory starting at address I.
     for j in range(x + 1):
@@ -179,3 +180,6 @@ def decode(opcode):
     pc += 2
   else:
     assert False 
+
+  mem.vn[x] &= 0xFF
+  mem.vn[y] &= 0xFF

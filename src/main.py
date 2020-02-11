@@ -6,6 +6,7 @@ import gpu
 import input
 import cpu
 import memory as mem
+import debug
 
 def main():
 
@@ -34,7 +35,6 @@ def main():
     gpu.draw = False
     cpu.cicle()
 
-
     # Emulate one cicle
     
     # Update Input
@@ -51,4 +51,5 @@ def main():
     if gpu.draw:
       gpu.drawScreen()
 
+    
 main()
