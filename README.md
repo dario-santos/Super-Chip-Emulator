@@ -67,3 +67,18 @@ The diagram bellow relates the used keys to their hexadimal codes.
 ## Sound
 
 Chip8 supports only a beep that is played when the _sound timer_ reaches zero.
+
+## Display
+
+Chip8 has a monochromatic 64 by 32 pixels display.
+
+    (0,0)           (63, 0)     
+    +---------------------+
+    |                     |
+    |                     |
+    |                     |
+    +---------------------+
+    (31, 0)        (63, 32)
+    
+    
+    
