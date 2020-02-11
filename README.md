@@ -47,3 +47,23 @@ VF is used for flags, carry, not borrow, etc.
 
 Along with the **registers**, there is also a **Stack** used to keep track of the return locations during a function calling.
 
+## Input
+
+The Chip8 Input is done via a 16 key keyboard with the hexadecimal codes from 0x0 to 0xF.
+
+The diagram bellow relates the used keys to their hexadimal codes.
+    
+    
+    +---+---+---+---+     +---+---+---+---+
+    |0x1|0x2|0x3|0xC|     | 1 | 2 | 3 | 4 |
+    +---+---+---+---+     +---+---+---+---+
+    |0x4|0x5|0x6|0xD|     | Q | W | E | R | 
+    +---+---+---+---+  >> +---+---+---+---+ 
+    |0x7|0x8|0x9|0xE|     | A | S | D | F | 
+    +---+---+---+---+     +---+---+---+---+
+    |0xA|0x0|0xB|0xF|     | Z | X | C | V |
+    +---+---+---+---+     +---+---+---+---+
+    
+## Sound
+
+Chip8 supports only a beep that is played when the _sound timer_ reaches zero.
