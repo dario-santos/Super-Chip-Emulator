@@ -19,6 +19,8 @@ The CPU as the methods
 Cycle:  Reponsible to do emulate a single cpu cycle
 Decode: Executes the requested opcode
 
+The complete opcode list can be accessed in [link](https://en.wikipedia.org/wiki/CHIP-8).
+
 ## Memory
 
 ### RAM
