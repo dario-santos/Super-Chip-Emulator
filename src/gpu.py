@@ -1,4 +1,5 @@
 import pygame
+import memory as mem
 import cpu
 
 # Window size
@@ -7,15 +8,15 @@ display_height = 320
 
 screen = None
 
-def initialize():
+def initialize(rom):
   global display_width, display_height, screen
   
   screen = pygame.display.set_mode((display_width, display_height))
   pygame.display.flip()
   pygame.display.update()
 
-
-  pygame.display.set_caption('CHIP8 - Keypad Test')
+  rom = rom.split('.')[0]
+  pygame.display.set_caption('CHIP8 - ' + rom.capitalize())
 
 def clear_display():
   global screen
@@ -34,7 +35,7 @@ def is_pixel_white(x, y):
 def draw_sprite(x, y, n):
   for dy in range(n):
     
-    line = cpu.memory[cpu.I + dy]
+    line = mem.memory[cpu.I + dy]
 
     for dx in range(8):
       _x = (x + dx) % 64
@@ -42,7 +43,7 @@ def draw_sprite(x, y, n):
 
       color = (line >> (7 - dx)) & 0x1
 
-      cpu.vn[0xF] = color ^ is_pixel_white(_x, _y)
+      mem.vn[0xF] = color ^ is_pixel_white(_x, _y)
 
       if color == 1:  
         color = (255, 255, 255)

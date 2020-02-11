@@ -1,22 +1,34 @@
-import video
+import sys
+import pygame
+import gpu
 import input
 import cpu
-import pygame
-
+import memory as mem
 
 def main():
-  # Setup graphics and Input
+
+  if len(sys.argv) != 2:
+    print("Error: invalid number of arguments.")
+    print("Example of usage: python3 main.py path/to/rom.c8")
+    return
+  
+  rom_path = sys.argv[1]
   pygame.init()
 
-  # Initialize Chip8 system and load the game
-  cpu.load_file("pong2.c8")
-  video.initialize()
+  # 1 - Start Chip8
+  
+  # Load and setup memory
+  mem.load_file(rom_path)
+
+  # Setup CPU and GPU
+  cpu.initialize()
+  gpu.initialize(rom_path)
 
   # Emulation Loop
   running = True
   
   while running:
-    # Emulate one cicle *)
+    # Emulate one cicle
     cpu.cicle()
     
     # Update Input
@@ -29,6 +41,7 @@ def main():
       elif event.type == pygame.KEYUP and event.key in input.input_scheme:
         input.input_status[input.input_scheme.index(event.key)] = 0
     
+    # Update GPU
     pygame.display.flip()
     pygame.display.update()
 
