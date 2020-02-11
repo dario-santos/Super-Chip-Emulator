@@ -18,3 +18,34 @@ The CPU as the methods
 
 Cycle:  Reponsible to do emulate a single cpu cycle
 Decode: Executes the requested opcode
+
+## Memory
+
+### RAM
+The Chip8 has 4KB of memory, 4096 memory locations of 8 bits.
+The first 512 addresses are reserved to the Chip8 interpreter so the programs start at the location 
+0x200 (the default value of _PC_).
+
++----------------+= 0xFFF (4095) End of Chip-8 RAM
+|                |
+|                |
+| 0x200 to 0xFFF |
+| Chip-8 Program |
+|                |
+|                |
++----------------+= 0x200 (512) Start of most Chip-8 programs
+| Reserved for   |
+|  interpreter   |
++----------------+= 0x000 (0) Start of Chip-8 RAM
+
+Diagram based on the [Cowgod's Chip-8 Technical Reference v1.0](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
+
+### Registers
+Chip8 as 16 8 bit registers, V0 to VF.
+
+VF is used for flags, carry, not borrow, etc.
+
+Along with the **registers**, there is also a **Stack** used to keep track of the return locations during a function calling.
+
+
+
