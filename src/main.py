@@ -1,5 +1,6 @@
 import sys
 import pygame
+import time
 import sound
 import gpu
 import input
@@ -21,17 +22,20 @@ def main():
   # Load and setup memory
   mem.load_file(rom_path)
 
-  # Setup CPU and GPU
+  # Setup Memory, CPU, GPU and Sound
   cpu.initialize()
   gpu.initialize(rom_path)
   sound.initialize()
 
   # Emulation Loop
   running = True
-  
   while running:
-    # Emulate one cicle
+    time.sleep(0.0025)
+    gpu.draw = False
     cpu.cicle()
+
+
+    # Emulate one cicle
     
     # Update Input
     for event in pygame.event.get():
@@ -44,7 +48,7 @@ def main():
         input.input_status[input.input_scheme.index(event.key)] = 0
     
     # Update GPU
-    pygame.display.flip()
-    pygame.display.update()
+    if gpu.draw:
+      gpu.drawScreen()
 
 main()

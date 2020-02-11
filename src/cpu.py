@@ -4,12 +4,18 @@ import input
 import sound
 import memory as mem
 
-pc     = 0x200
-opcode = 0
+# PC : Program Counter
+pc     = 0
+# Adress Register - 16 bits
 I      = 0
+opcode = 0
 
 def initialize():
-  global timer_delay, timer_sound
+  global pc, timer_delay, timer_sound
+
+  # The first 512 bytes are occuped by the CHIP8 itself
+  # So the starting position of the program counter is 0x200
+  pc = 0x200
 
   # Reset timers
   timer_delay = 0
@@ -43,7 +49,7 @@ def cicle ():
   decode(opcode)
 
   # 3 - Update timers
-  timer_delay = timer_delay - 1 if timer_delay > 0 else timer_delay
+  if timer_delay > 0: timer_delay -= 1
 
   if timer_sound > 0:
     if timer_sound == 1: sound.play()
@@ -59,18 +65,18 @@ def decode(opcode):
   nn  = opcode & 0x00FF
   nnn = opcode & 0x0FFF
   
-  # print_debug(opcode)
+  print('me:',hex(opcode))
   
-  if oc == 0x0 and x == 0x0 and y == 0xE and c == 0x0:   # Clears the screen.
+  if oc == 0x0 and x == 0x0 and y == 0xE and c == 0x0:   # CLS - Clead the display
     gpu.clear_display()
     pc += 2
-  elif oc == 0x0 and x == 0x0 and y == 0xE and c == 0xE: # Returns from a subroutine.
+  elif oc == 0x0 and x == 0x0 and y == 0xE and c == 0xE: # RET - Returns from a subroutine
     pc = mem.stack.pop()
     pc += 2
-  elif oc == 0x0: assert False
-  elif oc == 0x1: # Jumps to address NNN.
+  elif oc == 0x0: pc += 2 # Jump to a machine code routine at nnn. - Ignored by modern interpreters
+  elif oc == 0x1: # JP addr - Jumps to location NNN
     pc = nnn
-  elif oc == 0x2: # Calls subroutine at NNN.
+  elif oc == 0x2: # CALL addr - Calls subroutine at NNN
     mem.stack.append(pc)
     pc = nnn
   elif oc == 0x3: # Skips the next instruction if VN(X) equals NN.
@@ -99,15 +105,15 @@ def decode(opcode):
     pc += 2
   elif oc == 0x8 and c == 0x4: # Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
     mem.vn[0xF] = 1  if mem.vn[y] > (0xFF - mem.vn[x]) else 0
-    mem.vn[x] = mem.vn[x] + mem.vn[y]
+    mem.vn[x] += mem.vn[y]
     pc += 2
   elif oc == 0x8 and c == 0x5: # VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't
     mem.vn[0xF] = 0 if mem.vn[y] > mem.vn[x] else 1
     mem.vn[x] -= mem.vn[y]
     pc += 2
   elif oc == 0x8 and c == 0x6: # Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
-    mem.vn[0xF] = mem.vn[x] and 0x1
-    mem.vn[x] = mem.vn[x] >> 1
+    mem.vn[0xF] = mem.vn[x] & 0x1
+    mem.vn[x] = mem.vn[x] >> 1    
     pc += 2
   elif oc == 0x8 and c == 0x7: # Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
     mem.vn[0xF] = 0 if mem.vn[x] > mem.vn[y] else 1
@@ -128,7 +134,6 @@ def decode(opcode):
     mem.vn[x] = (random.randint(0, 255)) & nn;
     pc += 2
   elif oc == 0xD: # Draws a sprite at coordinate (VX, VY).
-    mem.vn[0xF] = 0
     gpu.draw_sprite(mem.vn[x], mem.vn[y], c)
     pc += 2
   elif oc == 0xE and y == 0x9 and c == 0xE: # Skips the next instruction if the key stored in VX is pressed.
@@ -138,7 +143,14 @@ def decode(opcode):
   elif oc == 0xF and y == 0x0 and c == 0x7: # Sets VX to the value of the delay timer.
     mem.vn[x] = timer_delay
     pc += 2
-  elif oc == 0xF and y == 0x0 and c == 0xA: assert False
+  elif oc == 0xF and y == 0x0 and c == 0xA: # A key press is awaited, and then stored in VX. (Blocking Operation.)
+    if 1 not in input.input_status: return
+
+    for i in range(16):
+      if input.input_status[i] == 1:
+        mem.vn[x] = i
+
+    pc += 2 
   elif oc == 0xF and y == 0x1 and c == 0x5: # Sets the delay timer to VX.
     timer_delay = mem.vn[x]
     pc += 2
@@ -152,10 +164,10 @@ def decode(opcode):
   elif oc == 0xF and y == 0x2 and c == 0x9: # Sets I to the location of the sprite for the character in VX.
     I = mem.vn[x] * 0x5
     pc += 2
-  elif oc == 0xF and y == 0x3 and c == 0x3:
-    mem.memory[I]     = int (mem.vn[(opcode & 0x0F00) >> 8] / 100)
-    mem.memory[I + 1] = int ((mem.vn[(opcode & 0x0F00) >> 8] / 10) % 10)
-    mem.memory[I + 2] = int ((mem.vn[(opcode & 0x0F00) >> 8] % 100) % 10)
+  elif oc == 0xF and y == 0x3 and c == 0x3: # Stores the binary-coded decimal representation of VX.
+    mem.memory[I]     = int (mem.vn[x] / 100)
+    mem.memory[I + 1] = int ((mem.vn[x] / 10) % 10)
+    mem.memory[I + 2] = int ((mem.vn[x] % 100) % 10)
     pc += 2
   elif oc == 0xF and y == 0x5 and c == 0x5: # Stores V0 to VX (including VX) in memory starting at address I.
     for j in range(x + 1):

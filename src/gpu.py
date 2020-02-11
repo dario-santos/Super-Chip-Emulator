@@ -8,6 +8,10 @@ display_height = 320
 
 screen = None
 
+display_buffer = [0] * 32 * 64
+draw = True
+
+
 def initialize(rom):
   global display_width, display_height, screen
   
@@ -21,33 +25,36 @@ def initialize(rom):
 def clear_display():
   global screen
   screen.fill((0, 0, 0))
+  pygame.display.flip()
+  pygame.display.update()
 
+def drawScreen():
+  global screen, display_buffer
+  black = (0, 0, 0)
+  white = (255, 255, 255)
+  screen.fill(black)
+  for i in range(len(display_buffer)):
+    x = int(i % 64)
+    y = int(i / 64)
+    if display_buffer[i] == 1:
+      pygame.draw.rect(screen, white, (x * 10, y * 10, 10, 10))
+    else:
+      pygame.draw.rect(screen, black, (x * 10, y * 10, 10, 10))
 
-def draw_pixel(color, x, y):
-  r = pygame.Rect(x * 10, y * 10, 10, 10)
-  pygame.draw.rect(screen, color, r)
+  pygame.display.update()
 
-
-def is_pixel_white(x, y):
-  global screen
-  return  1 if screen.get_at((x, y)) == (255, 255, 255) else 0
-  
 def draw_sprite(x, y, n):
+  global display_buffer, draw
+  mem.vn[0xF] = 0
+
   for dy in range(n):
-    
     line = mem.memory[cpu.I + dy]
-
     for dx in range(8):
-      _x = (x + dx) % 64
-      _y = y + dy 
+      if (line & (0x80 >> dx)) != 0:
+        loc = (x + dx + ((dy + y) * 64)) % 2048
 
-      color = (line >> (7 - dx)) & 0x1
+        if display_buffer[loc] == 1:
+          mem.vn[0xF] = 1
+        display_buffer[loc] ^= 1
 
-      mem.vn[0xF] = color ^ is_pixel_white(_x, _y)
-
-      if color == 1:  
-        color = (255, 255, 255)
-      else:
-        color = (0,0,0)
-
-      draw_pixel(color, _x, _y)
+  draw = True

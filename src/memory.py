@@ -19,10 +19,34 @@ fontset = [
   0xF0, 0x80, 0xF0, 0x80, 0x80  # F
 ]
 
-# Memory ram - 4KB
-memory = [0] * 4096
+# Memory Map
+#
+# +----------------+= 0xFFF (4095) End of Chip-8 RAM
+# |                |
+# |                |
+# |                |
+# |                |
+# |                |
+# | 0x200 to 0xFFF |
+# | Chip-8 Program |
+# |                |
+# |                |
+# |                |
+# |                |
+# |                |
+# +- - - - - - -  -+= 0x600 (1536) Start of ETI 660 Chip-8 programs
+# |                |
+# |                |
+# |                |
+# +----------------+= 0x200 (512) Start of most Chip-8 programs
+# | 0x000 to 0x1FF |
+# | Reserved for   |
+# |  interpreter   |
+# +----------------+= 0x000 (0) Start of Chip-8 RAM
+memory = [0] * 0x1000
 
 # Registers: One of the 16 available variables
+# vn[0xF] is used for flags - carry, borrow and pixel collision
 vn = [0] * 16
 
 # The Stack - Used for returns, normally has 48 bytes and 12 levels
@@ -32,11 +56,13 @@ stack = []
 timer_delay = 0
 timer_sound = 0
 
+
 def initialize():
   global memory, fontset
   # Load fontset
   for i in range(80):
     memory[i] = fontset[i]
+
 
 def load_file(rom):
   global memory
@@ -56,6 +82,12 @@ def load_file(rom):
 
 import time
 def print_debug(opcode):
+  """
+  Parameters
+  ----------
+  opcode : int
+    The opcode that will be executed by the CPU
+  """
   global memory, vn, stack, timer_delay, timer_sound, pc, I
   print('opcode:    ', hex(opcode))
   print('pc:    ', pc)
@@ -66,3 +98,4 @@ def print_debug(opcode):
   #print('memory:    ', memory)
 
   time.sleep(0)
+  
