@@ -1,10 +1,20 @@
 # CHIP8-Emulator
-A Chip8 emulator
+![CHIP8 logo](https://lh3.googleusercontent.com/proxy/qjht3M2ykiJgaJs6pOteCleRm5t-blsgDTb21ugkm8d1cpQMh_17Wbswum3PYbQPqaeSpa3SwDHCtCeE04jzC77i5QHiJKZUJG_SR5Fk7Q)
 
-## List of opcodes
+This is a Chip8 emulator done with Python 3.6 and Pygame.
+This project is divided in several modules for a better organization.
 
-All of the opcodes are implemented but there are a few bugs
+## CPU
+The CPU module as the variables
 
-## Pong
+PC     : Program Counter - The current address memory
+I      : The address register
+Opcode : The opcode that will be executed by the CPU
 
-Pong is 100% functional
+Delay timer: This timer is intended to be used for timing the events of games
+Sound timer: This timer is used for sound effects
+
+The CPU as the methods
+
+Cycle:  Reponsible to do emulate a single cpu cycle
+Decode: Executes the requested opcode
