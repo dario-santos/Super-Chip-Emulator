@@ -1,7 +1,7 @@
-# CHIP8-Emulator
+# Super Chip and Chip8 - Emulator
 ![CHIP8 logo](https://lh3.googleusercontent.com/proxy/qjht3M2ykiJgaJs6pOteCleRm5t-blsgDTb21ugkm8d1cpQMh_17Wbswum3PYbQPqaeSpa3SwDHCtCeE04jzC77i5QHiJKZUJG_SR5Fk7Q)
 
-This is a Chip8 emulator done with Python 3.6 and Pygame.
+This is a Super Chip and Chip8 emulator done with Python 3.6 and Pygame.
 This project is divided in several modules for a better organization.
 
 ## Installation
@@ -21,7 +21,8 @@ Built-in CLI
 
 ## Configuration
 
-You can change a set of configurations like the colors used by the emulator, you will find more information in the _src/config.ini_ file
+You can change a set of configurations like the colors used by the emulator. 
+You will find more information in the _src/config.ini_ file
 
 ## CPU
 The CPU module as the variables
