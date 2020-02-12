@@ -15,8 +15,7 @@ timer_delay = 0
 timer_sound = 0
 
 # Extended Mode
-# If True then Super Chip else Chip8
-
+# If enabled then use Super Chip mode, Chip8 otherwise
 is_extended = False
 
 def initialize():
@@ -66,7 +65,7 @@ def cicle ():
     timer_sound -= 1
     
 def decode(opcode):
-  global timer_delay, timer_sound, pc, I
+  global timer_delay, timer_sound, pc, I, is_extended
   oc  = opcode >> 12
   x   = (opcode & 0x0F00) >> 8
   y   = (opcode & 0x00F0) >> 4
@@ -80,12 +79,20 @@ def decode(opcode):
   elif oc == 0x0 and x == 0x0 and y == 0xE and c == 0xE: # RET - Returns from a subroutine
     pc = mem.stack.pop()
     pc += 2
-  elif oc == 0x0 and x == 0x0 and y == 0xC: assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xC: # SCD Nibble - Scroll display N lines down
+    gpu.scroll_down(c)
+    pc += 2 
   elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xB: assert False
   elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xC: assert False
   elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xD: assert False
-  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xE: assert False
-  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xF: assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xE: # Disable extended screen mode
+    is_extended = False
+    gpu.change_mode()
+    pc += 2
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xF: # Enable extended screen mode
+    is_extended = True
+    gpu.change_mode()
+    pc += 2
   elif oc == 0x0: pc += 2 # Jump to a machine code routine at nnn. - Ignored by modern interpreters
   elif oc == 0x1: # JP addr - Jumps to location NNN
     pc = nnn
@@ -99,25 +106,25 @@ def decode(opcode):
   elif oc == 0x5 and c == 0x0: # Skips the next instruction if VX equals VY.
     pc = pc + 4 if mem.vn[x] == mem.vn[y] else pc + 2
   elif oc == 0x6: # Assigns the value of NN to VX.
-    mem.vn[x] = nn & 0xFF
+    mem.vn[x] = nn
     pc += 2
   elif oc == 0x7: # Adds NN to VX.
     mem.vn[x] += nn
     mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0x8 and c == 0x0: # Sets VX to the value of VY.
-    mem.vn[x] = mem.vn[y] & 0xFF
+    mem.vn[x] = mem.vn[y]
     pc += 2
   elif oc == 0x8 and c == 0x1: # Sets VX to VX or VY. (Bitwise OR operation)
-    mem.vn[x] = mem.vn[x] | mem.vn[y]
+    mem.vn[x] |= mem.vn[y]
     mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0x8 and c == 0x2: # Sets VX to VX and VY. (Bitwise AND operation)
-    mem.vn[x] = mem.vn[x] & mem.vn[y]
+    mem.vn[x] &= mem.vn[y]
     mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0x8 and c == 0x3: # Sets VX to VX xor VY. (Bitwise XOR operation)
-    mem.vn[x] = mem.vn[x] ^ mem.vn[y]
+    mem.vn[x] ^= mem.vn[y]
     mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0x8 and c == 0x4: # Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
@@ -155,6 +162,9 @@ def decode(opcode):
     mem.vn[x] = (random.randint(0, 255)) & nn
     mem.vn[x] &= 0xFF
     pc += 2
+  elif oc == 0xD and c == 0x0: # Draws a sprite at coordinate (VX, VY).
+    gpu.draw_sprite(mem.vn[x], mem.vn[y], c)
+    pc += 2
   elif oc == 0xD: # Draws a sprite at coordinate (VX, VY).
     gpu.draw_sprite(mem.vn[x], mem.vn[y], c)
     pc += 2
@@ -181,16 +191,16 @@ def decode(opcode):
     pc += 2
   elif oc == 0xF and y == 0x1 and c == 0xE: # Adds VX to I. VF is set to 1 when there is a range overflow 0 otherwise.
     mem.vn[0xF] = 1 if I + mem.vn[x] > 0xFFF else 0
-    I += mem.vn[x] 
+    I += mem.vn[x]
     pc += 2
   elif oc == 0xF and y == 0x2 and c == 0x9: # Sets I to the location of the sprite for the character in VX.
     I = mem.vn[x] * 0x5
     pc += 2
   elif oc == 0xF and y == 0x3 and c == 0x0: assert False
   elif oc == 0xF and y == 0x3 and c == 0x3: # Stores the binary-coded decimal representation of VX.
-    mem.memory[I]     = int (mem.vn[x] / 100)        & 0xFF
-    mem.memory[I + 1] = int ((mem.vn[x] / 10) % 10)  & 0xFF
-    mem.memory[I + 2] = int ((mem.vn[x] % 100) % 10) & 0xFF
+    mem.memory[I]     = int (mem.vn[x] / 100)        & 0x00FF
+    mem.memory[I + 1] = int ((mem.vn[x] / 10) % 10)  & 0x00FF
+    mem.memory[I + 2] = int ((mem.vn[x] % 100) % 10) & 0x00FF
     pc += 2
   elif oc == 0xF and y == 0x5 and c == 0x5: # Stores V0 to VX (including VX) in memory starting at address I.
     for j in range(x + 1):

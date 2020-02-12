@@ -59,6 +59,7 @@ import os
 
 def print_dir(path):
   l = os.listdir(path)
+  l.sort()
 
   for e in l:
     if os.path.isdir(os.path.join(path, e)): continue

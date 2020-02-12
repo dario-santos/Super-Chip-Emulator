@@ -58,7 +58,6 @@ def initialize():
   for i in range(80):
     memory[i] = fontset[i]
 
-
 def load_file(rom):
   global memory
   
