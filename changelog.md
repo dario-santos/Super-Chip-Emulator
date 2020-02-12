@@ -1,8 +1,8 @@
 ## Changed
 
-- Added support for scroll down (Race is now supported)
+- Fixed drawing of 16 by 16 sprites - The Super Chip is now fully supported
 
 
 ## Todo
 
-- Add 16 bit fontset and the opcodes 
+- Add save states and load states
