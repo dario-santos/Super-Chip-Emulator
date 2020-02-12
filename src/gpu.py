@@ -61,6 +61,8 @@ def drawScreen():
 def draw_super_sprite(x, y):
   global display_buffer, draw, modifier_normal, modifier_extended
   
+  
+
   modifier = modifier_extended if cpu.is_extended else modifier_normal
 
   display_width = int(128 / modifier) 
@@ -74,7 +76,7 @@ def draw_super_sprite(x, y):
 
       if _y > display_width - 1 or _y < 0 : continue
 
-      if (line & (0x800 >> dx)) != 0:
+      if (line & (0xFFFF >> dx)) != 0:
         loc = (_x+ (_y << 6))
 
         mem.vn[0xF] |= display_buffer[loc] & 1
@@ -86,22 +88,23 @@ def draw_sprite(x, y, n):
   global display_buffer, draw, modifier_normal, modifier_extended
   
   modifier = modifier_extended if cpu.is_extended else modifier_normal
-  lgth = 8 * modifier_extended if not cpu.is_extended else 8 * modifier_normal
 
-  display_width = int(128 / modifier) 
+  display_width = 128 if cpu.is_extended else 64
+  display_height = 64 if cpu.is_extended else 32
   mem.vn[0xF] = 0
 
   for dy in range(n):
     line = mem.memory[cpu.I + dy]
-    for dx in range(lgth):
+    for dx in range(8):
       _x = (x + dx) % display_width
       _y = y + dy
 
-      if _y > display_width - 1 or _y < 0 : continue
+      if _y > display_height - 1 or _y < 0 : continue
 
       if (line & (0x80 >> dx)) != 0:
-        loc = (_x+ (_y << 6))
+        loc = (_x + (_y << (8 - modifier) ))
 
+        print(_x, _y, loc, len(display_buffer))
         mem.vn[0xF] |= display_buffer[loc] & 1
         display_buffer[loc] ^= 1
 

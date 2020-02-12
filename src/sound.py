@@ -8,7 +8,5 @@ def initialize():
 
 def play():
     global beep
-
-    pygame.mixer.Sound.play(beep)
-    
+    pygame.mixer.Sound.play(beep) 
     pygame.mixer.music.stop()

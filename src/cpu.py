@@ -163,7 +163,7 @@ def decode(opcode):
     mem.vn[x] &= 0xFF
     pc += 2
   elif oc == 0xD and c == 0x0: # Draws a sprite at coordinate (VX, VY).
-    gpu.draw_sprite(mem.vn[x], mem.vn[y], c)
+    gpu.draw_super_sprite(mem.vn[x], mem.vn[y])
     pc += 2
   elif oc == 0xD: # Draws a sprite at coordinate (VX, VY).
     gpu.draw_sprite(mem.vn[x], mem.vn[y], c)
