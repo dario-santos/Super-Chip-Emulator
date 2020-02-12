@@ -1,6 +1,7 @@
 import pygame
 import memory as mem
 import cpu
+import config
 
 # Exented mode      64 * 128
 # Non extended mode 32 * 64
@@ -44,8 +45,8 @@ def drawScreen():
   modifier = modifier_extended if cpu.is_extended else modifier_normal
   display_width = int(128 / modifier)
   
-  black = (44, 58, 71)
-  white = (236, 240, 241)
+  black = pygame.Color(config.color_background)
+  white = pygame.Color(config.color_foreground)
   screen.fill(black)
   for i in range(len(display_buffer)):
     x = int(i % display_width)

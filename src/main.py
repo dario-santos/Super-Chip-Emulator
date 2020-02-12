@@ -7,8 +7,11 @@ import input as i
 import cpu
 import memory as mem
 import debug
+import config
 
 def main():
+  # save_config()
+  config.load_config() 
 
   if len(sys.argv) == 2:
     rom_path = sys.argv[1] 
@@ -86,5 +89,6 @@ def room_selector():
     path = print_dir(path)
     if path is '': path = '..'
     if os.path.isfile(path): return path
+
 
 main()
