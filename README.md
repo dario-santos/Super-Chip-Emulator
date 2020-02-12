@@ -24,12 +24,29 @@ Built-in CLI
 You can change a set of configurations like the colors used by the emulator. 
 You will find more information in the _src/config.ini_ file
 
+## Super Chip and Chip 8
+
+The Super Chip has retro compatibility with Chip8, using one flag to change between the two modes.
+This flag is present in the _cpu.py_ file with the name *is_extended*
+
+
+![Game example 1](images/c8_1.png)
+
+![Game example 1](images/c8_2.png)
+
+![Game example 1](images/sc_1.png)
+
+![Game example 1](images/sc_2.png)
+
+
 ## CPU
 The CPU module as the variables
 
-PC     : Program Counter - The current address memory
-I      : The address register
-Opcode : The opcode that will be executed by the CPU
+PC      : Program Counter - The current address memory
+I       : The address register
+Opcode  : The opcode that will be executed by the CPU
+Extended: Changes between the Super Chip and Chip8 modes
+Restart : If it's to restart the console in the next cicle
 
 Delay timer: This timer is intended to be used for timing the events of games
 Sound timer: This timer is used for sound effects
@@ -92,21 +109,24 @@ Chip8 supports only a beep that is played when the _sound timer_ reaches zero.
 
 ## Display
 
-Chip8 has a monochromatic 64 by 32 pixels display.
+The Super Chip and Chip 8 have different display resolutions, Chip8 has a 64 by 32 and Super Chip a 128 by 64.
+In order to keep everything running smoothly the Chip8 is scaled to match the resolution of the Super Chip.
 
-    (0,0)           (63, 0)     
+Super Chip has a monochromatic 128 by 64 pixels display.
+
+    (0,0)           (127, 0)
     +---------------------+
     |                     |
     |                     |
     |                     |
     +---------------------+
-    (31, 0)        (63, 31)
-    
-## Todo
-
-Add support for the Super Chip (CHip 48).
+    (63, 0)        (127, 63)
 
 ## References
 
 - http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
 - https://en.wikipedia.org/wiki/CHIP-8
+- http://devernay.free.fr/hacks/chip8/schip.txt
+- https://www.google.pt/search?client=opera&q=super+chip+documentations
+- http://www.pong-story.com/chip8/
+
