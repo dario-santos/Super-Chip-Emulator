@@ -4,6 +4,14 @@
 This is a Chip8 emulator done with Python 3.6 and Pygame.
 This project is divided in several modules for a better organization.
 
+## Installation
+
+    pip3 install -r requirements.txt
+    
+## How to Use
+    
+    python3 main.py path/to/rom
+
 ## CPU
 The CPU module as the variables
 
