@@ -11,7 +11,6 @@ screen = None
 display_buffer = [0] * 32 * 64
 draw = True
 
-
 def initialize(rom):
   global display_width, display_height, screen
   
@@ -51,9 +50,13 @@ def draw_sprite(x, y, n):
   for dy in range(n):
     line = mem.memory[cpu.I + dy]
     for dx in range(8):
+      _x = (x + dx) % 64
+      _y = y + dy
+
+      if _y > 31 or _y < 0 : continue # No vertical warp, needed for blitz
 
       if (line & (0x80 >> dx)) != 0:
-        loc = (x + dx + ((dy + y) << 6)) % 2048
+        loc = (_x+ (_y << 6))
 
         mem.vn[0xF] |= display_buffer[loc] & 1
         display_buffer[loc] ^= 1
