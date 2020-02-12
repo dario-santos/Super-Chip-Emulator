@@ -44,21 +44,25 @@ def clear_display():
 def drawScreen():
   global screen, display_buffer, modifier_extended, modifier_normal
   modifier = modifier_extended if cpu.is_extended else modifier_normal
+
   display_width = int(128 / modifier)
   
   black = pygame.Color(config.color_background)
   white = pygame.Color(config.color_foreground)
+  
   screen.fill(black)
+
   for i in range(len(display_buffer)):
     x = int(i % display_width)
     y = int(i / display_width)
+    
     if display_buffer[i] == 1:
       pygame.draw.rect(screen, white, (x * 10 * modifier, y * 10 * modifier, 10 * modifier, 10 * modifier))
     else:
       pygame.draw.rect(screen, black, (x * 10 * modifier, y * 10 * modifier, 10 * modifier, 10 * modifier))
 
   pygame.display.update()
-
+  
 def draw_super_sprite(x, y):
   global display_buffer, draw
   
