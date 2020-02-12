@@ -98,6 +98,10 @@ Chip8 has a monochromatic 64 by 32 pixels display.
     +---------------------+
     (31, 0)        (63, 32)
     
+## Todo
+
+Add support for the Super Chip (CHip 48).
+
 ## References
 
 - http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
