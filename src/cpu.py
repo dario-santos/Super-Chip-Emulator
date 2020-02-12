@@ -14,6 +14,11 @@ opcode = 0
 timer_delay = 0
 timer_sound = 0
 
+# Extended Mode
+# If True then Super Chip else Chip8
+
+is_extended = False
+
 def initialize():
   global pc, timer_delay, timer_sound
 
@@ -75,12 +80,12 @@ def decode(opcode):
   elif oc == 0x0 and x == 0x0 and y == 0xE and c == 0xE: # RET - Returns from a subroutine
     pc = mem.stack.pop()
     pc += 2
-  elif oc == 0x0 and x == 0x0 and y == 0xC assert False
-  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xB assert False
-  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xC assert False
-  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xD assert False
-  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xE assert False
-  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xF assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xC: assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xB: assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xC: assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xD: assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xE: assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xF: assert False
   elif oc == 0x0: pc += 2 # Jump to a machine code routine at nnn. - Ignored by modern interpreters
   elif oc == 0x1: # JP addr - Jumps to location NNN
     pc = nnn
