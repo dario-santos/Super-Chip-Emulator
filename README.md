@@ -19,6 +19,9 @@ Built-in CLI
 
 ![CLI image](images/cli.png)
 
+## Configuration
+
+You can change a set of configurations like the colors used by the emulator, you will find more information in the _src/config.ini_ file
 
 ## CPU
 The CPU module as the variables
