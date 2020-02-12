@@ -30,8 +30,8 @@ def clear_display():
 
 def drawScreen():
   global screen, display_buffer
-  black = (0, 0, 0)
-  white = (255, 255, 255)
+  black = (44, 58, 71)
+  white = (236, 240, 241)
   screen.fill(black)
   for i in range(len(display_buffer)):
     x = int(i % 64)
