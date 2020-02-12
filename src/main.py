@@ -38,12 +38,13 @@ def main():
   # Emulation Loop
   running = True
   while running:
-    time.sleep(0.0025)
+    time.sleep(0)#.0025)
     gpu.draw = False
     cpu.cicle()
 
     # Emulate one cicle
-    
+    if cpu.can_reload:
+      running = False
     # Update Input
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
@@ -89,6 +90,5 @@ def room_selector():
     path = print_dir(path)
     if path is '': path = '..'
     if os.path.isfile(path): return path
-
 
 main()

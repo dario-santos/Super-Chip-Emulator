@@ -59,26 +59,27 @@ def drawScreen():
   pygame.display.update()
 
 def draw_super_sprite(x, y):
-  global display_buffer, draw, modifier_normal, modifier_extended
+  global display_buffer, draw
   
-  
+  if not cpu.is_extended:
+    draw_sprite(x, y, 16)
+    return
 
-  modifier = modifier_extended if cpu.is_extended else modifier_normal
-
-  display_width = int(128 / modifier) 
   mem.vn[0xF] = 0
 
-  for dy in range(n):
-    line = mem.getMemory16[cpu.I + dy]
-    for dx in range(lgth):
-      _x = (x + dx) % display_width
+  for dy in range(16):
+    line = (mem.memory[cpu.I + dy] << 8) | mem.memory[cpu.I + dy + 1]
+
+    for dx in range(16):
+      _x = (x + dx) % 128
       _y = y + dy
 
-      if _y > display_width - 1 or _y < 0 : continue
+      if _y > 63 or _y < 0 : continue
 
-      if (line & (0xFFFF >> dx)) != 0:
-        loc = (_x+ (_y << 6))
+      if (line & (0x8000 >> dx)) != 0:
+        loc = (_x + (_y << 7))
 
+        # print('SUPER DRAW', _x, _y, loc, len(display_buffer))
         mem.vn[0xF] |= display_buffer[loc] & 1
         display_buffer[loc] ^= 1
 
@@ -86,7 +87,6 @@ def draw_super_sprite(x, y):
 
 def draw_sprite(x, y, n):
   global display_buffer, draw, modifier_normal, modifier_extended
-  
   modifier = modifier_extended if cpu.is_extended else modifier_normal
 
   display_width = 128 if cpu.is_extended else 64
@@ -102,9 +102,7 @@ def draw_sprite(x, y, n):
       if _y > display_height - 1 or _y < 0 : continue
 
       if (line & (0x80 >> dx)) != 0:
-        loc = (_x + (_y << (8 - modifier) ))
-
-        print(_x, _y, loc, len(display_buffer))
+        loc = (_x + (_y << (8 - modifier)))
         mem.vn[0xF] |= display_buffer[loc] & 1
         display_buffer[loc] ^= 1
 
@@ -117,5 +115,41 @@ def change_mode():
   display_buffer = [0] * int((display_height * display_width) / modifier)
 
 def scroll_down(n):
-  raise NotImplemented
-  pass
+  global display_buffer, draw
+
+  old_display_buffer = display_buffer.copy()
+  display_buffer = [0] * 128 * 64
+
+  for y in range(64 - n):
+    for x in range(128):
+      display_buffer[x + (y + n) * 128] = old_display_buffer[x + y * 128]
+        
+  draw = True
+
+def scroll_right(is_extended):
+  global display_buffer, draw
+
+  translation = 4 if is_extended else 2
+
+  old_display_buffer = display_buffer.copy()
+  display_buffer = [0] * 128 * 64
+
+  for y in range(64):
+    for x in range(128 - translation):
+      display_buffer[(x + translation) + y * 128] = old_display_buffer[x + y * 128]
+     
+  draw = True
+
+def scroll_left(is_extended):
+  global display_buffer, draw
+
+  translation = 4 if is_extended else 2
+
+  old_display_buffer = display_buffer.copy()
+  display_buffer = [0] * 128 * 64
+
+  for y in range(64):
+    for x in range(128 - translation):
+      display_buffer[x + y * 128] = old_display_buffer[(x + translation) + y * 128]
+     
+  draw = True

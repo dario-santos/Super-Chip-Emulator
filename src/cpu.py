@@ -18,6 +18,9 @@ timer_sound = 0
 # If enabled then use Super Chip mode, Chip8 otherwise
 is_extended = False
 
+# Flag to know if is to restart the CPU
+can_reload = False
+
 def initialize():
   global pc, timer_delay, timer_sound
 
@@ -65,7 +68,7 @@ def cicle ():
     timer_sound -= 1
     
 def decode(opcode):
-  global timer_delay, timer_sound, pc, I, is_extended
+  global timer_delay, timer_sound, pc, I, is_extended, can_reload
   oc  = opcode >> 12
   x   = (opcode & 0x0F00) >> 8
   y   = (opcode & 0x00F0) >> 4
@@ -82,8 +85,11 @@ def decode(opcode):
   elif oc == 0x0 and x == 0x0 and y == 0xC: # SCD Nibble - Scroll display N lines down
     gpu.scroll_down(c)
     pc += 2 
-  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xB: assert False
-  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xC: assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xB: # SCR - Scroll screen right 4 pixels if Extended 2 if not
+    gpu.scroll_right(is_extended)
+    pc += 2
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xC:
+    can_reload = True
   elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xD: assert False
   elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xE: # Disable extended screen mode
     is_extended = False
@@ -196,7 +202,9 @@ def decode(opcode):
   elif oc == 0xF and y == 0x2 and c == 0x9: # Sets I to the location of the sprite for the character in VX.
     I = mem.vn[x] * 0x5
     pc += 2
-  elif oc == 0xF and y == 0x3 and c == 0x0: assert False
+  elif oc == 0xF and y == 0x3 and c == 0x0:
+    I = mem.vn[x] * 0x0A + 80
+    pc += 2
   elif oc == 0xF and y == 0x3 and c == 0x3: # Stores the binary-coded decimal representation of VX.
     mem.memory[I]     = int (mem.vn[x] / 100)        & 0x00FF
     mem.memory[I + 1] = int ((mem.vn[x] / 10) % 10)  & 0x00FF
@@ -210,8 +218,16 @@ def decode(opcode):
     for j in range(x + 1):
       mem.vn[j] = mem.memory[I + j]
     pc += 2
-  elif oc == 0xF and y == 0x7 and c == 0x5: assert False
-  elif oc == 0xF and y == 0x8 and c == 0x5: assert False
+  elif oc == 0xF and y == 0x7 and c == 0x5: # Store V0 .. VX in RPL user flags. Only V0 .. V7 valid
+    if x > 7: assert False
+    for i in range(x + 1):
+      mem.rpl[i] = mem.vn[i]
+    pc += 2
+  elif oc == 0xF and y == 0x8 and c == 0x5: # Read V0 .. VX from RPL user flags. Only V0 .. V7 valid
+    if x > 7: assert False
+    for i in range(x + 1):
+      mem.vn[i] = mem.rpl[i]
+    pc += 2
   else:
     print("The opcode:", hex(opcode), "is not implemented.")
     raise False
