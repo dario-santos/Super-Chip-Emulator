@@ -22,11 +22,17 @@ is_extended = False
 can_reload = False
 
 def initialize():
-  global pc, timer_delay, timer_sound
+  global pc, I, opcode, timer_delay, timer_sound, is_extended, can_reload
 
   # The first 512 bytes are occuped by the CHIP8 itself
   # So the starting position of the program counter is 0x200
   pc = 0x200
+  I  = 0
+  opcode = 0
+  
+  is_extended = False
+
+  can_reload = False
 
   # Reset timers
   timer_delay = 0
@@ -88,9 +94,12 @@ def decode(opcode):
   elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xB: # SCR - Scroll screen right 4 pixels if Extended 2 if not
     gpu.scroll_right(is_extended)
     pc += 2
-  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xC:
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xC: # SCL - Scroll screen left 4 pixels if Extended 2 if not
+    assert False
+    gpu.scroll_left(is_extended)
+    pc += 2
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xD: 
     can_reload = True
-  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xD: assert False
   elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xE: # Disable extended screen mode
     is_extended = False
     gpu.change_mode()

@@ -14,6 +14,7 @@ display_height = 64
 
 screen = None
 display_buffer = []
+
 draw = True
 
 def initialize(rom):

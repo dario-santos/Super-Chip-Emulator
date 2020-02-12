@@ -76,8 +76,16 @@ rpl = [0] * 8
 stack = []
 
 def initialize():
-  global memory, chip8_fontset, schip_fontset
+  global chip8_fontset, schip_fontset, memory, vn, rpl, stack 
   
+  memory = [0] * 0x1000
+
+  vn = [0] * 16
+
+  rpl = [0] * 8
+
+  stack = []
+
   # Load fontsets
   for i in range(80):
     memory[i] = chip8_fontset[i]
@@ -100,28 +108,3 @@ def load_file(rom):
   
     for i in range(0, rom_length):
       memory[0x200 + i] = int.from_bytes(rom.read(1), "big")
-
-
-
-0x0C, 0x0C, 0x3C, 0x3C, 0x0C, 0x0C, 0x0C, 0x0C, 0x3F, 0x3F,
-
-# 11111111
-# 11111111
-# 00000011
-# 00000011
-# 11111111
-# 11111111
-# 11000000
-# 11000000
-# 11111111
-# 11111111
-
-
-0x20, 0x60, 0x20, 0x20, 0x70
-0xF0, 0x10, 0xF0, 0x80, 0xF0
-
-# 1111
-# 1000
-# 1111
-# 0001
-# 1111

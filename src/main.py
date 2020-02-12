@@ -10,35 +10,15 @@ import debug
 import config
 
 def main():
-  # save_config()
-  config.load_config() 
-
-  if len(sys.argv) == 2:
-    rom_path = sys.argv[1] 
-    
-    if os.path.splitext(rom_path)[1] not in ['.ch8', '.c8']: 
-      print('Error - the givin file does not have the extension .ch8 or .c8')
-      return
-  else:
-    rom_path = room_selector()
-    
-  # rom_path = sys.argv[1]
   pygame.init()
 
   # 1 - Start Chip8
-  
-  # Load and setup memory
-  mem.load_file(rom_path)
-
-  # Setup Memory, CPU, GPU and Sound
-  cpu.initialize()
-  gpu.initialize(rom_path)
-  sound.initialize()
+  start_emulator(rom_path)
 
   # Emulation Loop
   running = True
   while running:
-    time.sleep(0)#.0025)
+    time.sleep(0.0025)
     gpu.draw = False
     cpu.cicle()
 
@@ -58,6 +38,18 @@ def main():
     # Update GPU
     if gpu.draw:
       gpu.drawScreen()
+
+def start_emulator(rom_path):
+  # Start Memory
+  mem.load_file(rom_path)
+  # Start CPU
+  cpu.initialize()
+  # Start GPU
+  gpu.initialize(rom_path)
+  # Start Audio
+  sound.initialize()
+  # Start Input
+  i.initialize()
 
 import os
 
@@ -91,4 +83,20 @@ def room_selector():
     if path is '': path = '..'
     if os.path.isfile(path): return path
 
-main()
+
+
+# save_config()
+config.load_config() 
+
+if len(sys.argv) == 2:
+  rom_path = sys.argv[1] 
+    
+  if os.path.splitext(rom_path)[1] not in ['.ch8', '.c8']: 
+    print('Error - the givin file does not have the extension .ch8 or .c8')
+    exit(-1)
+else:
+  rom_path = room_selector()
+    
+while True:
+  main()
+  if not cpu.can_reload: break

@@ -39,6 +39,10 @@ input_scheme = [
 
 input_status = [0] * 16
 
+def initialize():
+  global input_status
+  input_status = [0] * 16
+
 def is_key_pressed(keycode):
   global input_status
   return input_status[keycode] == 1
