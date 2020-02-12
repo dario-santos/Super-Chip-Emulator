@@ -17,7 +17,7 @@ Terminal:
 
 Built-in CLI
 
-![CLI images](image/cli.png)
+![CLI image](images/cli.png)
 
 
 ## CPU
