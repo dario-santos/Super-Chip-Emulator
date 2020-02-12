@@ -99,7 +99,7 @@ Chip8 has a monochromatic 64 by 32 pixels display.
     |                     |
     |                     |
     +---------------------+
-    (31, 0)        (63, 32)
+    (31, 0)        (63, 31)
     
 ## Todo
 
