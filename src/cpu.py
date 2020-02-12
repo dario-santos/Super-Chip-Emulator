@@ -75,6 +75,12 @@ def decode(opcode):
   elif oc == 0x0 and x == 0x0 and y == 0xE and c == 0xE: # RET - Returns from a subroutine
     pc = mem.stack.pop()
     pc += 2
+  elif oc == 0x0 and x == 0x0 and y == 0xC assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xB assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xC assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xD assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xE assert False
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xF assert False
   elif oc == 0x0: pc += 2 # Jump to a machine code routine at nnn. - Ignored by modern interpreters
   elif oc == 0x1: # JP addr - Jumps to location NNN
     pc = nnn
@@ -175,6 +181,7 @@ def decode(opcode):
   elif oc == 0xF and y == 0x2 and c == 0x9: # Sets I to the location of the sprite for the character in VX.
     I = mem.vn[x] * 0x5
     pc += 2
+  elif oc == 0xF and y == 0x3 and c == 0x0: assert False
   elif oc == 0xF and y == 0x3 and c == 0x3: # Stores the binary-coded decimal representation of VX.
     mem.memory[I]     = int (mem.vn[x] / 100)        & 0xFF
     mem.memory[I + 1] = int ((mem.vn[x] / 10) % 10)  & 0xFF
@@ -188,5 +195,8 @@ def decode(opcode):
     for j in range(x + 1):
       mem.vn[j] = mem.memory[I + j]
     pc += 2
+  elif oc == 0xF and y == 0x7 and c == 0x5: assert False
+  elif oc == 0xF and y == 0x8 and c == 0x5: assert False
   else:
-    assert False 
+    print("The opcode:", hex(opcode), "is not implemented.")
+    raise False
