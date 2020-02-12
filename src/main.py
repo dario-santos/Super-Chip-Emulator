@@ -83,8 +83,6 @@ def room_selector():
     if path is '': path = '..'
     if os.path.isfile(path): return path
 
-
-
 # save_config()
 config.load_config() 
 

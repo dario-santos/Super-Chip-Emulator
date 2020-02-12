@@ -67,10 +67,11 @@ def draw_super_sprite(x, y):
     return
 
   mem.vn[0xF] = 0
+  mem_address = cpu.I
+  for dy in range(0, 16):
 
-  for dy in range(16):
-    line = (mem.memory[cpu.I + dy] << 8) | mem.memory[cpu.I + dy + 1]
-
+    line = (mem.memory[mem_address] << 8) | mem.memory[mem_address + 1]
+    mem_address += 2
     for dx in range(16):
       _x = (x + dx) % 128
       _y = y + dy
@@ -80,7 +81,6 @@ def draw_super_sprite(x, y):
       if (line & (0x8000 >> dx)) != 0:
         loc = (_x + (_y << 7))
 
-        # print('SUPER DRAW', _x, _y, loc, len(display_buffer))
         mem.vn[0xF] |= display_buffer[loc] & 1
         display_buffer[loc] ^= 1
 

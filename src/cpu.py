@@ -95,10 +95,9 @@ def decode(opcode):
     gpu.scroll_right(is_extended)
     pc += 2
   elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xC: # SCL - Scroll screen left 4 pixels if Extended 2 if not
-    assert False
     gpu.scroll_left(is_extended)
     pc += 2
-  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xD: 
+  elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xD: # EXIT- Terminate the interpreter
     can_reload = True
   elif oc == 0x0 and x == 0x0 and y == 0xF and c == 0xE: # Disable extended screen mode
     is_extended = False
@@ -211,7 +210,7 @@ def decode(opcode):
   elif oc == 0xF and y == 0x2 and c == 0x9: # Sets I to the location of the sprite for the character in VX.
     I = mem.vn[x] * 0x5
     pc += 2
-  elif oc == 0xF and y == 0x3 and c == 0x0:
+  elif oc == 0xF and y == 0x3 and c == 0x0: # LD HF,VX - Point I to 10 byte numeric sprite for value in VX
     I = mem.vn[x] * 0x0A + 80
     pc += 2
   elif oc == 0xF and y == 0x3 and c == 0x3: # Stores the binary-coded decimal representation of VX.
