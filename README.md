@@ -4,6 +4,22 @@
 This is a Chip8 emulator done with Python 3.6 and Pygame.
 This project is divided in several modules for a better organization.
 
+## Installation
+
+    pip3 install -r requirements.txt
+    
+## How to Use
+You can you use the build-in CLI to select the rom or the terminal.
+
+Terminal:
+    
+    python3 main.py path/to/rom
+
+Built-in CLI
+
+![CLI images](image/cli.png)
+
+
 ## CPU
 The CPU module as the variables
 
