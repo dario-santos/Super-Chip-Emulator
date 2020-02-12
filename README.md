@@ -61,13 +61,13 @@ Diagram based on the [Cowgod's Chip-8 Technical Reference v1.0](http://devernay.
 ### Registers
 Chip8 as 16 8 bit registers, V0 to VF.
 
-VF is used for flags, carry, not borrow, etc.
+VF is used for flags ( carry, not borrow, etc.).
 
-Along with the **registers**, there is also a **Stack** used to keep track of the return locations during a function calling.
+Along with the **registers**, there is also a **Stack** used to keep track of the return locations during a function call.
 
 ## Input
 
-The Chip8 Input is done via a 16 key keyboard with the hexadecimal codes from 0x0 to 0xF.
+The Chip8 input is done via a 16 key keyboard with the hexadecimal codes from 0x0 to 0xF.
 
 The diagram bellow relates the used keys to their hexadimal codes.
     
