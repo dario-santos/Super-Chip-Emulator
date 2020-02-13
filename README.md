@@ -1,5 +1,5 @@
 # Super Chip and Chip8 - Emulator
-![CHIP8 logo](https://lh3.googleusercontent.com/proxy/qjht3M2ykiJgaJs6pOteCleRm5t-blsgDTb21ugkm8d1cpQMh_17Wbswum3PYbQPqaeSpa3SwDHCtCeE04jzC77i5QHiJKZUJG_SR5Fk7Q)
+![CHIP8 logo](images/chip8_logo.jpg)
 
 This is a Super Chip and Chip8 emulator done with Python 3.6 and Pygame.
 This project is divided in several modules for a better organization.
